@@ -1,0 +1,806 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BINWATCH — Smart Trash Bin Monitor</title>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+<style>
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #0b120f;
+    color: #eaf3ec;
+    min-height: 100vh;
+    padding: 25px;
+}
+
+.container {
+    max-width: 800px;
+    margin: auto;
+}
+
+/* HEADER */
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #26382e;
+    padding-bottom: 20px;
+    margin-bottom: 25px;
+}
+
+.logo {
+    font-size: 32px;
+    font-weight: bold;
+}
+
+.logo span {
+    color: #ff7a3c;
+}
+
+.subtitle {
+    color: #35d488;
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+
+.system {
+    text-align: right;
+}
+
+.system-title {
+    font-size: 11px;
+    color: #82988c;
+}
+
+#system-status {
+    color: #35d488;
+    font-weight: bold;
+}
+
+/* FIREBASE STATUS */
+
+#firebase-message {
+    margin-bottom: 20px;
+    font-size: 13px;
+    color: #82988c;
+    text-align: center;
+}
+
+/* ALERT */
+
+#notice-banner {
+    display: none;
+    background: rgba(255, 71, 87, 0.12);
+    border: 1px solid #ff4757;
+    color: #ff4757;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-weight: bold;
+}
+
+/* BIN CARD */
+
+.bin-card {
+    background: #121b17;
+    border: 1px solid #26382e;
+    border-left: 4px solid #35d488;
+    border-radius: 10px;
+    padding: 25px;
+}
+
+.bin-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 25px;
+}
+
+.bin-header h2 {
+    font-size: 22px;
+}
+
+.live {
+    color: #35d488;
+    font-size: 12px;
+}
+
+/* CONTENT */
+
+.content {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* BIN */
+
+.bin-container {
+    text-align: center;
+}
+
+.bin {
+    width: 130px;
+    height: 170px;
+    border: 4px solid #33463b;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+    background: #17221c;
+}
+
+.bin-fill {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 0%;
+    background: #35d488;
+    transition: height 0.8s, background 0.5s;
+}
+
+.percentage {
+    font-size: 28px;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+/* DATA */
+
+.data {
+    min-width: 230px;
+}
+
+.status {
+    display: inline-block;
+    padding: 7px 15px;
+    border-radius: 20px;
+    background: #17221c;
+    border: 1px solid #33463b;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+.data-row {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px dashed #26382e;
+    padding: 10px 0;
+    color: #82988c;
+}
+
+.data-row b {
+    color: #eaf3ec;
+}
+
+.action {
+    display: none;
+    color: #ff4757;
+    font-weight: bold;
+    margin-top: 15px;
+}
+
+footer {
+    text-align: center;
+    margin-top: 25px;
+    color: #4d5c53;
+    font-size: 11px;
+}
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+
+    body {
+        padding: 15px;
+    }
+
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .system {
+        text-align: left;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<header>
+
+    <div>
+        <div class="subtitle">
+            FACILITY IoT · ESP32-C3 ULTRASONIC SENSOR
+        </div>
+
+        <div class="logo">
+            BIN<span>WATCH</span>
+        </div>
+    </div>
+
+    <div class="system">
+
+        <div class="system-title">
+            SYSTEM
+        </div>
+
+        <div id="system-status">
+            CONNECTING...
+        </div>
+
+    </div>
+
+</header>
+
+
+<!-- FIREBASE CONNECTION STATUS -->
+
+<div id="firebase-message">
+    Connecting to Firebase...
+</div>
+
+
+<!-- ALERT -->
+
+<div id="notice-banner">
+    ⚠ ATTENTION — BIN REQUIRES COLLECTION
+</div>
+
+
+<!-- BIN -->
+
+<section class="bin-card" id="bin-card">
+
+    <div class="bin-header">
+
+        <h2>Floor 1</h2>
+
+        <div class="live">
+            ● LIVE
+        </div>
+
+    </div>
+
+
+    <div class="content">
+
+        <div class="bin-container">
+
+            <div class="bin">
+
+                <div
+                    class="bin-fill"
+                    id="bin-fill">
+                </div>
+
+            </div>
+
+            <div class="percentage">
+
+                <span id="percentage">
+                    --
+                </span>%
+
+            </div>
+
+        </div>
+
+
+        <div class="data">
+
+            <div
+                class="status"
+                id="status-label">
+
+                Waiting for data...
+
+            </div>
+
+
+            <div class="data-row">
+
+                <span>
+                    Distance
+                </span>
+
+                <b id="distance">
+                    -- cm
+                </b>
+
+            </div>
+
+
+            <div class="data-row">
+
+                <span>
+                    Firmware Status
+                </span>
+
+                <b id="raw-status">
+                    --
+                </b>
+
+            </div>
+
+
+            <div class="data-row">
+
+                <span>
+                    Updated
+                </span>
+
+                <b id="updated">
+                    --
+                </b>
+
+            </div>
+
+
+            <div
+                class="action"
+                id="action">
+
+                🚨 Please empty this bin now!
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<footer>
+
+    Connected to Firebase Realtime Database · /bins/floor1
+
+</footer>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   FIREBASE CONFIGURATION
+   ===================================================== */
+
+const firebaseConfig = {
+
+    apiKey:
+        "AIzaSyBYaa4a2dfSPHQ7-j1rkSG-CaA6bv0EV-0",
+
+    databaseURL:
+        "https://trashbin-monitor-e8c8c-default-rtdb.asia-southeast1.firebasedatabase.app"
+
+};
+
+
+/* =====================================================
+   INITIALIZE FIREBASE
+   ===================================================== */
+
+firebase.initializeApp(firebaseConfig);
+
+const db = firebase.database();
+
+console.log("Firebase initialized");
+
+
+/* =====================================================
+   BIN CALIBRATION
+   ===================================================== */
+
+const BIN_EMPTY_CM = 40;
+const BIN_FULL_CM = 5;
+
+
+/* =====================================================
+   CONVERT DISTANCE TO PERCENTAGE
+   ===================================================== */
+
+function distanceToPercent(distance) {
+
+    if (
+        distance === null ||
+        distance === undefined ||
+        isNaN(distance)
+    ) {
+        return null;
+    }
+
+    const range =
+        BIN_EMPTY_CM - BIN_FULL_CM;
+
+    const filled =
+        BIN_EMPTY_CM - distance;
+
+    let percentage =
+        (filled / range) * 100;
+
+    return Math.max(
+        0,
+        Math.min(100, percentage)
+    );
+}
+
+
+/* =====================================================
+   GET BIN LEVEL
+   ===================================================== */
+
+function getLevel(percent) {
+
+    if (percent === null) {
+
+        return {
+            name: "No Signal",
+            color: "#35d488"
+        };
+
+    }
+
+    if (percent <= 19) {
+
+        return {
+            name: "Empty",
+            color: "#35d488"
+        };
+
+    } else if (percent <= 39) {
+
+        return {
+            name: "Low",
+            color: "#9fdb5c"
+        };
+
+    } else if (percent <= 64) {
+
+        return {
+            name: "Medium",
+            color: "#f0b429"
+        };
+
+    } else if (percent <= 84) {
+
+        return {
+            name: "High",
+            color: "#ff7a3c"
+        };
+
+    } else {
+
+        return {
+            name: "Full",
+            color: "#ff4757"
+        };
+
+    }
+}
+
+
+/* =====================================================
+   UPDATE WEBSITE
+   ===================================================== */
+
+function updateWebsite(data) {
+
+    console.log(
+        "Firebase data received:",
+        data
+    );
+
+
+    /* Distance */
+
+    const distance =
+        Number(data.distance_cm);
+
+
+    /* Percentage */
+
+    const percent =
+        distanceToPercent(distance);
+
+
+    /* Level */
+
+    const level =
+        getLevel(percent);
+
+
+    /* =================================================
+       PERCENTAGE
+       ================================================= */
+
+    document.getElementById(
+        "percentage"
+    ).textContent =
+
+        percent === null
+        ? "N/A"
+        : Math.round(percent);
+
+
+    /* =================================================
+       DISTANCE
+       ================================================= */
+
+    document.getElementById(
+        "distance"
+    ).textContent =
+
+        isNaN(distance)
+        ? "-- cm"
+        : distance + " cm";
+
+
+    /* =================================================
+       STATUS
+       ================================================= */
+
+    document.getElementById(
+        "status-label"
+    ).textContent =
+        level.name;
+
+
+    /* =================================================
+       FIRMWARE STATUS
+       ================================================= */
+
+    document.getElementById(
+        "raw-status"
+    ).textContent =
+        data.status || "--";
+
+
+    /* =================================================
+       UPDATED TIME
+       ================================================= */
+
+    if (data.last_updated) {
+
+        const date =
+            new Date(
+                Number(data.last_updated) * 1000
+            );
+
+        document.getElementById(
+            "updated"
+        ).textContent =
+            date.toLocaleTimeString();
+
+    } else {
+
+        document.getElementById(
+            "updated"
+        ).textContent =
+            "--";
+
+    }
+
+
+    /* =================================================
+       BIN COLOR AND HEIGHT
+       ================================================= */
+
+    const fill =
+        document.getElementById(
+            "bin-fill"
+        );
+
+    fill.style.height =
+        (percent || 0) + "%";
+
+    fill.style.background =
+        level.color;
+
+
+    /* =================================================
+       STATUS COLOR
+       ================================================= */
+
+    document.getElementById(
+        "status-label"
+    ).style.color =
+        level.color;
+
+
+    document.getElementById(
+        "bin-card"
+    ).style.borderLeftColor =
+        level.color;
+
+
+    /* =================================================
+       FULL ALERT
+       ================================================= */
+
+    const banner =
+        document.getElementById(
+            "notice-banner"
+        );
+
+    const action =
+        document.getElementById(
+            "action"
+        );
+
+    const system =
+        document.getElementById(
+            "system-status"
+        );
+
+
+    if (level.name === "Full") {
+
+        banner.style.display =
+            "block";
+
+        action.style.display =
+            "block";
+
+        system.textContent =
+            "ATTENTION";
+
+        system.style.color =
+            "#ff4757";
+
+    } else {
+
+        banner.style.display =
+            "none";
+
+        action.style.display =
+            "none";
+
+        system.textContent =
+            "OPERATIONAL";
+
+        system.style.color =
+            "#35d488";
+
+    }
+
+}
+
+
+/* =====================================================
+   FIREBASE REALTIME LISTENER
+   ===================================================== */
+
+db.ref("/bins/floor1").on(
+
+    "value",
+
+    function(snapshot) {
+
+        const data =
+            snapshot.val();
+
+
+        console.log(
+            "Firebase snapshot:",
+            data
+        );
+
+
+        if (data) {
+
+            updateWebsite(data);
+
+
+            document.getElementById(
+                "firebase-message"
+            ).textContent =
+                "✓ Firebase connected — receiving data.";
+
+
+        } else {
+
+            document.getElementById(
+                "firebase-message"
+            ).textContent =
+                "Firebase connected, but no data found.";
+
+
+            document.getElementById(
+                "system-status"
+            ).textContent =
+                "WAITING";
+
+
+            document.getElementById(
+                "percentage"
+            ).textContent =
+                "--";
+
+
+            document.getElementById(
+                "distance"
+            ).textContent =
+                "-- cm";
+
+
+            document.getElementById(
+                "raw-status"
+            ).textContent =
+                "--";
+
+
+            document.getElementById(
+                "updated"
+            ).textContent =
+                "--";
+
+
+            document.getElementById(
+                "status-label"
+            ).textContent =
+                "Waiting for data...";
+
+        }
+
+    },
+
+
+    function(error) {
+
+        console.error(
+            "Firebase error:",
+            error
+        );
+
+
+        document.getElementById(
+            "firebase-message"
+        ).textContent =
+            "✕ Firebase error: " +
+            error.message;
+
+
+        document.getElementById(
+            "system-status"
+        ).textContent =
+            "OFFLINE";
+
+
+        document.getElementById(
+            "system-status"
+        ).style.color =
+            "#ff4757";
+
+    }
+
+);
+
+</script>
+
+</body>
+</html>
+```
