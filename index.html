@@ -1,830 +1,380 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
 
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>BINWATCH | Smart Trash Monitor</title>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-
-
 <style>
 
-:root{
+:root {
+  --bg: #0b120f;
+  --panel: #121b17;
+  --panel2: #17221c;
+  --border: #26372e;
+  --text: #eaf3ec;
+  --muted: #82988c;
 
-  --bg:#0b120f;
-
-  --panel:#121b17;
-
-  --panel-alt:#17221c;
-
-  --border:#223229;
-
-  --text-hi:#eaf3ec;
-
-  --text-lo:#82988c;
-
-  --text-dim:#4d5c53;
-
-  --lvl-empty:#35d488;
-
-  --lvl-low:#9fdb5c;
-
-  --lvl-medium:#f0b429;
-
-  --lvl-high:#ff7a3c;
-
-  --lvl-full:#ff4757;
-
+  --green: #35d488;
+  --low: #9fdb5c;
+  --yellow: #f0b429;
+  --orange: #ff7a3c;
+  --red: #ff4757;
 }
 
-
-*{
-
-  box-sizing:border-box;
-
-  margin:0;
-
-  padding:0;
-
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-
-body{
-
-  background:
-
-    radial-gradient(
-      circle at 10% -10%,
-      rgba(53,212,136,0.06),
-      transparent 45%
-    ),
-
-    radial-gradient(
-      circle at 100% 0%,
-      rgba(255,122,60,0.05),
-      transparent 40%
-    ),
-
-    var(--bg);
-
-  color:var(--text-hi);
-
-  font-family:'Inter',sans-serif;
-
-  min-height:100vh;
-
-  padding:26px;
-
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, sans-serif;
+  min-height: 100vh;
+  padding: 20px;
 }
 
-
-.wrap{
-
-  max-width:1180px;
-
-  margin:auto;
-
+.container {
+  max-width: 950px;
+  margin: auto;
 }
 
+/* HEADER */
 
-/* =====================================
-   HEADER
-===================================== */
-
-.console-bar{
-
-  display:flex;
-
-  justify-content:space-between;
-
-  align-items:flex-end;
-
-  flex-wrap:wrap;
-
-  gap:16px;
-
-  border-bottom:1px solid var(--border);
-
-  padding-bottom:18px;
-
-  margin-bottom:20px;
-
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
 }
 
-
-.brand-eyebrow{
-
-  font-family:'JetBrains Mono',monospace;
-
-  font-size:11px;
-
-  letter-spacing:.16em;
-
-  text-transform:uppercase;
-
-  color:var(--lvl-empty);
-
-  margin-bottom:6px;
-
+.small-title {
+  color: var(--green);
+  font-size: 12px;
+  letter-spacing: 2px;
+  margin-bottom: 7px;
 }
 
-
-h1{
-
-  font-family:'Space Grotesk',sans-serif;
-
-  font-size:36px;
-
-  font-weight:700;
-
-  line-height:1;
-
+h1 {
+  font-size: 38px;
 }
 
-
-h1 span{
-
-  color:var(--lvl-high);
-
+h1 span {
+  color: var(--orange);
 }
 
-
-.console-stats{
-
-  display:flex;
-
-  align-items:center;
-
-  gap:22px;
-
+.system-box {
+  text-align: right;
 }
 
-
-.stat{
-
-  display:flex;
-
-  flex-direction:column;
-
-  align-items:flex-end;
-
-  gap:2px;
-
+.system-label {
+  color: var(--muted);
+  font-size: 11px;
+  margin-bottom: 4px;
 }
 
-
-.stat-label{
-
-  font-family:'JetBrains Mono',monospace;
-
-  font-size:10px;
-
-  color:var(--text-lo);
-
-  letter-spacing:.1em;
-
-  text-transform:uppercase;
-
+#system-status {
+  font-size: 18px;
+  font-weight: bold;
 }
 
-
-.stat-value{
-
-  font-family:'Space Grotesk',sans-serif;
-
-  font-size:17px;
-
-  font-weight:600;
-
+.online {
+  color: var(--green);
 }
 
-
-.stat-value.ok{
-
-  color:var(--lvl-empty);
-
+.offline {
+  color: var(--red);
 }
 
-
-.stat-value.warn{
-
-  color:var(--lvl-full);
-
+.clock {
+  color: var(--muted);
+  margin-top: 5px;
 }
 
+/* NOTIFICATION BUTTON */
 
-.clock{
-
-  font-family:'JetBrains Mono',monospace;
-
-  font-size:15px;
-
-  color:var(--text-lo);
-
-  border-left:1px solid var(--border);
-
-  padding-left:22px;
-
+#notificationBtn {
+  margin-top: 12px;
+  padding: 10px 16px;
+  border: 1px solid var(--green);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--green);
+  cursor: pointer;
+  font-weight: bold;
 }
 
-
-/* =====================================
-   ALERT
-===================================== */
-
-#notice-banner{
-
-  display:none;
-
-  margin-bottom:22px;
-
-  padding:13px 18px;
-
-  border-radius:8px;
-
-  background:rgba(255,71,87,.1);
-
-  border:1px solid rgba(255,71,87,.5);
-
-  color:var(--lvl-full);
-
-  font-family:'JetBrains Mono',monospace;
-
-  font-size:13px;
-
-  animation:alertPulse 1.5s infinite;
-
+#notificationBtn:disabled {
+  opacity: 0.6;
+  cursor: default;
 }
 
+/* FULL ALERT */
 
-@keyframes alertPulse{
+#alert {
+  display: none;
+  margin: 20px 0;
+  padding: 15px;
+  border: 1px solid var(--red);
+  border-radius: 8px;
+  color: var(--red);
+  background: rgba(255, 71, 87, 0.10);
+  font-weight: bold;
+  text-align: center;
+}
 
-  0%,100%{
+/* BIN CARD */
 
-    box-shadow:0 0 0 0 rgba(255,71,87,.2);
+.bin-card {
+  margin: 25px auto 0;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--green);
+  border-radius: 12px;
+  padding: 22px;
+  transition: border-color 0.4s;
+}
 
+.bin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.bin-header h2 {
+  font-size: 22px;
+}
+
+.live {
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/* BIN CONTENT */
+
+.bin-content {
+  display: grid;
+  grid-template-columns: 80px 160px 1fr;
+  gap: 25px;
+  align-items: center;
+}
+
+/* LEVEL LADDER */
+
+.ladder {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 5px;
+}
+
+.rung {
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  font-size: 9px;
+  color: var(--muted);
+}
+
+.rung.active.empty {
+  background: var(--green);
+  color: #07120d;
+}
+
+.rung.active.low {
+  background: var(--low);
+  color: #07120d;
+}
+
+.rung.active.medium {
+  background: var(--yellow);
+  color: #07120d;
+}
+
+.rung.active.high {
+  background: var(--orange);
+  color: #07120d;
+}
+
+.rung.active.full {
+  background: var(--red);
+  color: white;
+}
+
+/* BIN VISUAL */
+
+.bin-visual {
+  text-align: center;
+}
+
+.bin-lid {
+  width: 115px;
+  height: 8px;
+  margin: auto;
+  margin-bottom: 5px;
+  background: var(--border);
+  border-radius: 5px;
+}
+
+.bin {
+  width: 100px;
+  height: 130px;
+  margin: auto;
+  position: relative;
+  border: 4px solid var(--border);
+  border-radius: 5px 5px 15px 15px;
+  overflow: hidden;
+}
+
+.bin-fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 0%;
+  background: var(--green);
+  transition: height 0.7s, background 0.5s;
+}
+
+.percentage {
+  margin-top: 12px;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+/* DATA */
+
+.data {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.status {
+  display: inline-block;
+  width: fit-content;
+  padding: 7px 14px;
+  border-radius: 20px;
+  background: var(--panel2);
+  font-weight: bold;
+  color: var(--green);
+}
+
+.data-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed var(--border);
+  font-size: 13px;
+}
+
+.data-row span {
+  color: var(--muted);
+}
+
+.data-row strong {
+  color: var(--text);
+}
+
+/* FIREBASE */
+
+.connection {
+  margin-top: 20px;
+  padding: 14px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+#firebase-status {
+  color: var(--green);
+  font-weight: bold;
+}
+
+/* FOOTER */
+
+footer {
+  text-align: center;
+  margin-top: 25px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+/* MOBILE */
+
+@media(max-width:650px) {
+
+  body {
+    padding: 12px;
   }
 
-  50%{
-
-    box-shadow:0 0 0 8px rgba(255,71,87,0);
-
+  h1 {
+    font-size: 30px;
   }
 
-}
-
-
-/* =====================================
-   BIN
-===================================== */
-
-.bin-grid{
-
-  max-width:520px;
-
-  margin:auto;
-
-}
-
-
-.bin-module{
-
-  background:var(--panel);
-
-  border:1px solid var(--border);
-
-  border-left:3px solid var(--accent,var(--lvl-empty));
-
-  border-radius:10px;
-
-  padding:18px;
-
-  transition:.5s;
-
-}
-
-
-.bin-module[data-level="full"]{
-
-  animation:fullAlert 1.8s infinite;
-
-}
-
-
-@keyframes fullAlert{
-
-  0%,100%{
-
-    box-shadow:0 0 0 0 rgba(255,71,87,.18);
-
+  .system-box {
+    text-align: left;
   }
 
-  50%{
-
-    box-shadow:0 0 0 10px rgba(255,71,87,0);
-
+  .bin-content {
+    grid-template-columns: 55px 100px 1fr;
+    gap: 12px;
   }
 
-}
-
-
-/* =====================================
-   BIN HEADER
-===================================== */
-
-.module-head{
-
-  display:flex;
-
-  justify-content:space-between;
-
-  align-items:center;
-
-  margin-bottom:16px;
-
-}
-
-
-.module-head h2{
-
-  font-family:'Space Grotesk',sans-serif;
-
-  font-size:19px;
-
-  font-weight:600;
-
-}
-
-
-.heartbeat{
-
-  display:flex;
-
-  align-items:center;
-
-  gap:6px;
-
-  font-family:'JetBrains Mono',monospace;
-
-  font-size:10px;
-
-  color:var(--text-lo);
-
-  letter-spacing:.1em;
-
-}
-
-
-.heartbeat i{
-
-  width:7px;
-
-  height:7px;
-
-  border-radius:50%;
-
-  background:var(--accent,var(--lvl-empty));
-
-  animation:beat 2s infinite;
-
-}
-
-
-@keyframes beat{
-
-  0%,100%{
-
-    opacity:.35;
-
-    transform:scale(.85);
-
+  .bin {
+    width: 75px;
+    height: 115px;
   }
 
-  50%{
-
-    opacity:1;
-
-    transform:scale(1.15);
-
+  .bin-lid {
+    width: 85px;
   }
 
+  .data-row {
+    font-size: 11px;
+  }
 }
 
+@media(max-width:480px) {
 
-/* =====================================
-   BODY
-===================================== */
-
-.module-body{
-
-  display:flex;
-
-  gap:18px;
-
-  align-items:stretch;
-
-  flex-wrap:wrap;
-
-}
-
-
-/* =====================================
-   LADDER
-===================================== */
-
-.ladder{
-
-  display:flex;
-
-  flex-direction:column-reverse;
-
-  gap:3px;
-
-  width:70px;
-
-  flex-shrink:0;
-
-}
-
-
-.rung{
-
-  flex:1;
-
-  min-height:20px;
-
-  background:var(--panel-alt);
-
-  border:1px solid var(--border);
-
-  border-radius:4px;
-
-  display:flex;
-
-  align-items:center;
-
-  justify-content:center;
-
-  transition:.4s;
-
-}
-
-
-.rung span{
-
-  font-family:'JetBrains Mono',monospace;
-
-  font-size:8.5px;
-
-  color:var(--text-dim);
-
-}
-
-
-.rung.active{
-
-  border-color:transparent;
-
-}
-
-
-.rung.active span{
-
-  color:#0b120f;
-
-  font-weight:600;
-
-}
-
-
-.rung.active[data-level="empty"]{
-
-  background:var(--lvl-empty);
-
-}
-
-
-.rung.active[data-level="low"]{
-
-  background:var(--lvl-low);
-
-}
-
-
-.rung.active[data-level="medium"]{
-
-  background:var(--lvl-medium);
-
-}
-
-
-.rung.active[data-level="high"]{
-
-  background:var(--lvl-high);
-
-}
-
-
-.rung.active[data-level="full"]{
-
-  background:var(--lvl-full);
-
-  box-shadow:0 0 12px rgba(255,71,87,.6);
-
-}
-
-
-/* =====================================
-   BIN VISUAL
-===================================== */
-
-.bin-visual{
-
-  width:110px;
-
-  flex-shrink:0;
-
-  display:flex;
-
-  flex-direction:column;
-
-  align-items:center;
-
-  gap:8px;
-
-}
-
-
-svg.bin-shape{
-
-  width:100px;
-
-  height:130px;
-
-}
-
-
-.bin-outline{
-
-  fill:none;
-
-  stroke:var(--border);
-
-  stroke-width:3;
-
-}
-
-
-.bin-fill-rect{
-
-  transition:
-
-    y .8s ease,
-
-    height .8s ease,
-
-    fill .8s ease;
-
-}
-
-
-.fill-readout{
-
-  font-family:'JetBrains Mono',monospace;
-
-  font-size:24px;
-
-  font-weight:600;
-
-}
-
-
-.fill-readout small{
-
-  font-size:13px;
-
-  color:var(--text-lo);
-
-}
-
-
-/* =====================================
-   DATA
-===================================== */
-
-.data-col{
-
-  flex:1;
-
-  min-width:150px;
-
-  display:flex;
-
-  flex-direction:column;
-
-  gap:10px;
-
-}
-
-
-.status-label{
-
-  display:inline-block;
-
-  align-self:flex-start;
-
-  padding:5px 12px;
-
-  border-radius:20px;
-
-  background:var(--panel-alt);
-
-  border:1px solid var(--border);
-
-  color:var(--accent,var(--text-hi));
-
-  font-family:'Space Grotesk',sans-serif;
-
-  font-size:14px;
-
-  font-weight:600;
-
-}
-
-
-.data-row{
-
-  display:flex;
-
-  justify-content:space-between;
-
-  gap:10px;
-
-  border-bottom:1px dashed var(--border);
-
-  padding-bottom:6px;
-
-  font-family:'JetBrains Mono',monospace;
-
-  font-size:12.5px;
-
-  color:var(--text-lo);
-
-}
-
-
-.data-row b{
-
-  color:var(--text-hi);
-
-  font-weight:500;
-
-  text-align:right;
-
-}
-
-
-.action-msg{
-
-  display:none;
-
-  color:var(--lvl-full);
-
-  font-size:12.5px;
-
-  font-weight:600;
-
-}
-
-
-.bin-module[data-level="full"] .action-msg{
-
-  display:block;
-
-}
-
-
-/* =====================================
-   CONNECTION
-===================================== */
-
-.connection{
-
-  margin-top:20px;
-
-  padding:12px;
-
-  border:1px solid var(--border);
-
-  border-radius:8px;
-
-  background:var(--panel);
-
-  font-family:'JetBrains Mono',monospace;
-
-  font-size:11px;
-
-  color:var(--text-lo);
-
-  text-align:center;
-
-}
-
-
-.connection span{
-
-  color:var(--lvl-empty);
-
-}
-
-
-/* =====================================
-   FOOTER
-===================================== */
-
-footer{
-
-  text-align:center;
-
-  margin-top:26px;
-
-  color:var(--text-dim);
-
-  font-family:'JetBrains Mono',monospace;
-
-  font-size:11px;
-
-}
-
-
-/* =====================================
-   MOBILE
-===================================== */
-
-@media(max-width:600px){
-
-  body{
-
-    padding:15px;
-
+  .bin-card {
+    padding: 15px;
   }
 
-
-  h1{
-
-    font-size:30px;
-
+  .bin-content {
+    grid-template-columns: 50px 85px 1fr;
+    gap: 10px;
   }
 
-
-  .console-stats{
-
-    width:100%;
-
-    justify-content:space-between;
-
+  .bin {
+    width: 65px;
+    height: 105px;
   }
 
-
-  .module-body{
-
-    gap:12px;
-
+  .bin-lid {
+    width: 75px;
   }
 
-
-  .ladder{
-
-    width:55px;
-
-  }
-
-
-  .bin-visual{
-
-    width:90px;
-
-  }
-
-
-  svg.bin-shape{
-
-    width:85px;
-
-  }
-
-
-  .data-col{
-
-    min-width:100%;
-
+  .data-row {
+    flex-direction: column;
+    gap: 3px;
   }
 
 }
@@ -833,172 +383,143 @@ footer{
 
 </head>
 
-
 <body>
 
+<div class="container">
 
-<div class="wrap">
-
-
-<!-- =====================================
+<!-- =====================================================
      HEADER
-===================================== -->
+===================================================== -->
 
-<div class="console-bar">
+<header>
 
   <div>
 
-    <div class="brand-eyebrow">
+<div class="small-title">
+  FACILITY IoT · ESP32
+</div>
 
-      Facility IoT · ESP32 Ultrasonic Sensor
-
-    </div>
-
-
-    <h1>
-
-      BIN<span>WATCH</span>
-
-    </h1>
+<h1>
+  BIN<span>WATCH</span>
+</h1>
 
   </div>
 
+  <div class="system-box">
 
-  <div class="console-stats">
+<div class="system-label">
+  ESP32 STATUS
+</div>
 
-    <div class="stat">
+<div
+  id="system-status"
+  class="offline">
 
-      <span class="stat-label">
+  OFFLINE
 
-        System
+</div>
 
-      </span>
+<div
+  id="clock"
+  class="clock">
 
-      <span
-        class="stat-value ok"
-        id="system-status"
-      >
+  --:--:--
 
-        CONNECTING
+</div>
 
-      </span>
+<button
+  id="notificationBtn"
+  onclick="enableNotifications()">
 
-    </div>
+  Enable Notifications
 
-
-    <div
-      class="clock"
-      id="clock"
-    >
-
-      --:--:--
-
-    </div>
+</button>
 
   </div>
 
+</header>
+
+<!-- =====================================================
+     FULL ALERT
+===================================================== -->
+
+<div id="alert">
+
+🚨 TRASH BIN FULL
+
+  <br>
+
+Floor 1 bin needs to be emptied.
+
 </div>
 
-
-<!-- =====================================
-     ALERT
-===================================== -->
-
-<div id="notice-banner">
-
-  ⚠ ATTENTION - BIN REQUIRES COLLECTION
-
-</div>
-
-
-<!-- =====================================
+<!-- =====================================================
      BIN CARD
-===================================== -->
-
-<main class="bin-grid">
-
+===================================================== -->
 
 <section
-  class="bin-module"
-  id="card-floor1"
-  data-level="empty"
->
+  class="bin-card"
+  id="binCard">
 
+  <div class="bin-header">
 
-<div class="module-head">
+<h2>
+  Floor 1
+</h2>
 
-  <h2>
+<div
+  id="live-text"
+  class="live offline">
 
-    Floor 1
-
-  </h2>
-
-
-  <div class="heartbeat">
-
-    <i></i>
-
-    LIVE
-
-  </div>
+  ● ESP32 OFFLINE
 
 </div>
 
+  </div>
 
-<div class="module-body">
-
+  <div class="bin-content">
 
 <!-- LEVEL LADDER -->
 
 <div class="ladder">
 
-
   <div
-    class="rung"
-    data-level="full"
-  >
+    class="rung full"
+    data-level="full">
 
-    <span>FULL</span>
+    FULL
 
   </div>
 
-
   <div
-    class="rung"
-    data-level="high"
-  >
+    class="rung high"
+    data-level="high">
 
-    <span>HIGH</span>
+    HIGH
 
   </div>
 
-
   <div
-    class="rung"
-    data-level="medium"
-  >
+    class="rung medium"
+    data-level="medium">
 
-    <span>MED</span>
+    MED
 
   </div>
 
-
   <div
-    class="rung"
-    data-level="low"
-  >
+    class="rung low"
+    data-level="low">
 
-    <span>LOW</span>
+    LOW
 
   </div>
 
-
   <div
-    class="rung"
-    data-level="empty"
-  >
+    class="rung empty"
+    data-level="empty">
 
-    <span>EMPTY</span>
+    EMPTY
 
   </div>
 
@@ -1009,190 +530,126 @@ footer{
 
 <div class="bin-visual">
 
+  <div class="bin-lid"></div>
 
-<svg
-  class="bin-shape"
-  viewBox="0 0 100 130"
->
+  <div class="bin">
 
+    <div
+      id="bin-fill"
+      class="bin-fill">
 
-<defs>
+    </div>
 
-<clipPath id="clip-floor1">
+  </div>
 
-<path
-  d="M14,14 L86,14 L76,120 L24,120 Z"
-/>
+  <div class="percentage">
 
-</clipPath>
+    <span id="percentage">
+      0
+    </span>%
 
-</defs>
-
-
-<rect
-  id="fill-floor1"
-  class="bin-fill-rect"
-  x="0"
-  y="120"
-  width="100"
-  height="0"
-  fill="var(--lvl-empty)"
-  clip-path="url(#clip-floor1)"
-/>
-
-
-<path
-  class="bin-outline"
-  d="M14,14 L86,14 L76,120 L24,120 Z"
-/>
-
-
-<line
-  class="bin-outline"
-  x1="6"
-  y1="14"
-  x2="94"
-  y2="14"
-/>
-
-
-</svg>
-
-
-<div class="fill-readout">
-
-<span id="percentage-floor1">
-
---
-
-</span>
-
-<small>%</small>
-
-</div>
-
+  </div>
 
 </div>
 
 
 <!-- DATA -->
 
-<div class="data-col">
+<div class="data">
+
+  <div
+    id="status"
+    class="status">
+
+    WAITING
+
+  </div>
 
 
-<span
-  class="status-label"
-  id="label-floor1"
->
+  <div class="data-row">
 
-Waiting for data...
+    <span>
+      Distance
+    </span>
 
-</span>
+    <strong id="distance">
+      -- cm
+    </strong>
 
-
-<div class="data-row">
-
-<span>
-
-Distance
-
-</span>
-
-<b id="distance-floor1">
-
--- cm
-
-</b>
-
-</div>
+  </div>
 
 
-<div class="data-row">
+  <div class="data-row">
 
-<span>
+    <span>
+      Fill Level
+    </span>
 
-Firebase status
+    <strong id="fill">
+      -- %
+    </strong>
 
-</span>
-
-<b id="raw-floor1">
-
---
-
-</b>
-
-</div>
+  </div>
 
 
-<div class="data-row">
+  <div class="data-row">
 
-<span>
+    <span>
+      ESP32
+    </span>
 
-Updated
+    <strong id="esp-status">
+      OFFLINE
+    </strong>
 
-</span>
-
-<b id="time-floor1">
-
---
-
-</b>
-
-</div>
+  </div>
 
 
-<div class="action-msg">
+  <div class="data-row">
 
-🚨 Please empty this bin now!
+    <span>
+      Last Seen
+    </span>
+
+    <strong id="last-seen">
+      --
+    </strong>
+
+  </div>
 
 </div>
 
-
-</div>
-
-
-</div>
-
+  </div>
 
 </section>
 
-
-</main>
-
-
-<!-- CONNECTION STATUS -->
+<!-- FIREBASE CONNECTION -->
 
 <div class="connection">
 
 Firebase:
 
-<span id="firebase-status">
-
-Connecting...
-
-</span>
+  <span id="firebase-status">
+    CONNECTING
+  </span>
 
 </div>
-
 
 <footer>
 
-Connected to Firebase Realtime Database · /bin1 · LIVE
+Firebase Realtime Database · /bin1
 
 </footer>
 
-
 </div>
 
-
-<!-- =====================================
+<!-- =====================================================
      FIREBASE SDK
-===================================== -->
+===================================================== -->
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-
 
 <script>
 
@@ -1212,401 +669,139 @@ const firebaseConfig = {
 };
 
 
-// Initialize Firebase
-
-firebase.initializeApp(firebaseConfig);
-
-
-// Database
-
-const db = firebase.database();
+firebase.initializeApp(
+  firebaseConfig
+);
 
 
-// =====================================================
-// BIN SETTINGS
-// =====================================================
-
-const BIN_EMPTY_CM = 40.0;
-
-const BIN_FULL_CM = 5.0;
+const db =
+  firebase.database();
 
 
 // =====================================================
-// LEVELS
+// SETTINGS
 // =====================================================
 
-const LEVEL_ORDER = [
+// ESP32 sends data every 5 seconds.
+// If no new last_seen is received for 15 seconds,
+// the ESP32 is considered offline.
 
-  "empty",
-
-  "low",
-
-  "medium",
-
-  "high",
-
-  "full"
-
-];
+const ONLINE_TIMEOUT =
+  15000;
 
 
-function getLevel(percentage){
+// =====================================================
+// VARIABLES
+// =====================================================
 
-  if(percentage < 20){
+let fullNotificationSent =
+  false;
 
-    return "empty";
+let notificationEnabled =
+  false;
+
+let lastSeenValue =
+  null;
+
+
+// =====================================================
+// ENABLE NOTIFICATIONS
+// =====================================================
+
+async function enableNotifications() {
+
+
+  if (
+    !("Notification" in window)
+  ) {
+
+    alert(
+      "Your browser does not support notifications."
+    );
+
+    return;
 
   }
 
-  if(percentage < 40){
 
-    return "low";
+  const permission =
+    await Notification.requestPermission();
+
+
+  if (
+    permission === "granted"
+  ) {
+
+    notificationEnabled =
+      true;
+
+
+    const button =
+      document.getElementById(
+        "notificationBtn"
+      );
+
+
+    button.textContent =
+      "Notifications Enabled";
+
+
+    button.disabled =
+      true;
+
+
+    new Notification(
+      "BINWATCH",
+      {
+
+        body:
+          "Trash bin notifications are enabled."
+
+      }
+
+    );
 
   }
-
-  if(percentage < 65){
-
-    return "medium";
-
-  }
-
-  if(percentage < 85){
-
-    return "high";
-
-  }
-
-  return "full";
 
 }
 
 
 // =====================================================
-// UPDATE WEBSITE
+// FIREBASE CONNECTION STATUS
 // =====================================================
 
-function updateWebsite(data){
-
-  console.log(
-    "Firebase data:",
-    data
-  );
-
-
-  // ---------------------------------------
-  // Get values
-  // ---------------------------------------
-
-  const distance =
-    Number(data.distance);
-
-
-  const percentage =
-    Number(data.fillpercentage);
-
-
-  const status =
-    data.status || "ONLINE";
-
-
-  // ---------------------------------------
-  // Calculate percentage if missing
-  // ---------------------------------------
-
-  let percent = percentage;
-
-
-  if(isNaN(percent)){
-
-    if(!isNaN(distance)){
-
-      percent =
-        (
-          (BIN_EMPTY_CM - distance) /
-          (BIN_EMPTY_CM - BIN_FULL_CM)
-        ) * 100;
-
-    }
-
-  }
-
-
-  if(!isNaN(percent)){
-
-    percent =
-      Math.max(
-        0,
-        Math.min(
-          100,
-          percent
-        )
-      );
-
-  }
-
-
-  // ---------------------------------------
-  // Level
-  // ---------------------------------------
-
-  const level =
-    isNaN(percent)
-      ? "empty"
-      : getLevel(percent);
-
-
-  // ---------------------------------------
-  // Card
-  // ---------------------------------------
-
-  const card =
-    document.getElementById(
-      "card-floor1"
-    );
-
-
-  card.dataset.level =
-    level;
-
-
-  card.style.setProperty(
-    "--accent",
-    `var(--lvl-${level})`
-  );
-
-
-  // ---------------------------------------
-  // Percentage
-  // ---------------------------------------
-
-  document.getElementById(
-    "percentage-floor1"
-  ).textContent =
-
-    isNaN(percent)
-      ? "--"
-      : Math.round(percent);
-
-
-  // ---------------------------------------
-  // Distance
-  // ---------------------------------------
-
-  document.getElementById(
-    "distance-floor1"
-  ).textContent =
-
-    isNaN(distance)
-      ? "-- cm"
-      : distance.toFixed(2) + " cm";
-
-
-  // ---------------------------------------
-  // Status
-  // ---------------------------------------
-
-  document.getElementById(
-    "label-floor1"
-  ).textContent =
-
-    status;
-
-
-  document.getElementById(
-    "raw-floor1"
-  ).textContent =
-
-    status;
-
-
-  // ---------------------------------------
-  // Updated
-  // ---------------------------------------
-
-  document.getElementById(
-    "time-floor1"
-  ).textContent =
-
-    new Date().toLocaleTimeString();
-
-
-  // ---------------------------------------
-  // BIN FILL
-  // ---------------------------------------
-
-  const rect =
-    document.getElementById(
-      "fill-floor1"
-    );
-
-
-  const totalHeight = 106;
-
-
-  const height =
-
-    isNaN(percent)
-      ? 0
-      : totalHeight * (percent / 100);
-
-
-  rect.setAttribute(
-    "y",
-    120 - height
-  );
-
-
-  rect.setAttribute(
-    "height",
-    height
-  );
-
-
-  rect.setAttribute(
-    "fill",
-    `var(--lvl-${level})`
-  );
-
-
-  // ---------------------------------------
-  // LADDER
-  // ---------------------------------------
-
-  const currentIndex =
-    LEVEL_ORDER.indexOf(level);
-
-
-  card
-    .querySelectorAll(".rung")
-    .forEach(rung => {
-
-      const rungIndex =
-        LEVEL_ORDER.indexOf(
-          rung.dataset.level
-        );
-
-
-      rung.classList.toggle(
-        "active",
-        rungIndex <= currentIndex
-      );
-
-    });
-
-
-  // ---------------------------------------
-  // SYSTEM STATUS
-  // ---------------------------------------
-
-  const system =
-    document.getElementById(
-      "system-status"
-    );
-
-
-  const notice =
-    document.getElementById(
-      "notice-banner"
-    );
-
-
-  if(level === "full"){
-
-    system.textContent =
-      "ATTENTION";
-
-    system.className =
-      "stat-value warn";
-
-    notice.style.display =
-      "block";
-
-  }
-
-  else{
-
-    system.textContent =
-      "OPERATIONAL";
-
-    system.className =
-      "stat-value ok";
-
-    notice.style.display =
-      "none";
-
-  }
-
-
-  // Firebase status
-
-  document.getElementById(
-    "firebase-status"
-  ).textContent =
-    "CONNECTED";
-
-}
-
-
-// =====================================================
-// FIREBASE REALTIME LISTENER
-// =====================================================
-
-// THIS MATCHES YOUR DATABASE:
-//
-// /bin1
-//    /distance
-//    /fillpercentage
-//    /status
-
-db.ref("/bin1").on(
+db.ref(".info/connected").on(
 
   "value",
 
-  function(snapshot){
+  function(snapshot) {
 
-    const data =
+
+    const connected =
       snapshot.val();
 
 
-    console.log(
-      "Received:",
-      data
-    );
+    const firebaseStatus =
+      document.getElementById(
+        "firebase-status"
+      );
 
 
-    if(data){
+    if (
+      connected === true
+    ) {
 
-      updateWebsite(data);
+      firebaseStatus.textContent =
+        "CONNECTED";
 
     }
 
-  },
+    else {
 
+      firebaseStatus.textContent =
+        "DISCONNECTED";
 
-  function(error){
-
-    console.error(
-      "Firebase error:",
-      error
-    );
-
-
-    document.getElementById(
-      "firebase-status"
-    ).textContent =
-      "ERROR";
-
-
-    document.getElementById(
-      "system-status"
-    ).textContent =
-      "OFFLINE";
-
-
-    document.getElementById(
-      "system-status"
-    ).className =
-      "stat-value warn";
+    }
 
   }
 
@@ -1614,15 +809,720 @@ db.ref("/bin1").on(
 
 
 // =====================================================
+// LISTEN TO BIN DATA
+// =====================================================
+
+db.ref("/bin1").on(
+
+  "value",
+
+  function(snapshot) {
+
+
+    const data =
+      snapshot.val();
+
+
+    if (
+      !data
+    ) {
+
+      setESP32Offline();
+
+      return;
+
+    }
+
+
+    updateBin(
+      data
+    );
+
+  },
+
+  function(error) {
+
+    console.error(
+      "Firebase error:",
+      error
+    );
+
+  }
+
+);
+
+
+// =====================================================
+// UPDATE BIN
+// =====================================================
+
+function updateBin(
+  data
+) {
+
+
+  // ===================================================
+  // DISTANCE
+  // ===================================================
+
+  const distance =
+    Number(
+      data.distance
+    );
+
+
+  if (
+    !isNaN(distance)
+  ) {
+
+    document.getElementById(
+      "distance"
+    ).textContent =
+      distance.toFixed(2)
+      + " cm";
+
+  }
+
+
+  // ===================================================
+  // PERCENTAGE
+  // ===================================================
+
+  let percentage =
+    Number(
+      data.fillpercentage
+    );
+
+
+  if (
+    isNaN(percentage)
+  ) {
+
+    percentage = 0;
+
+  }
+
+
+  percentage =
+    Math.max(
+      0,
+      Math.min(
+        100,
+        percentage
+      )
+    );
+
+
+  document.getElementById(
+    "percentage"
+  ).textContent =
+    Math.round(
+      percentage
+    );
+
+
+  document.getElementById(
+    "fill"
+  ).textContent =
+    percentage.toFixed(1)
+    + " %";
+
+
+  // ===================================================
+  // STATUS
+  // ===================================================
+
+  const status =
+    String(
+      data.status ||
+      "UNKNOWN"
+    ).toUpperCase();
+
+
+  document.getElementById(
+    "status"
+  ).textContent =
+    status;
+
+
+  // ===================================================
+  // SAVE LAST SEEN
+  // ===================================================
+
+  lastSeenValue =
+    data.last_seen;
+
+
+  // ===================================================
+  // CHECK ESP32
+  // ===================================================
+
+  checkESP32Status(
+    data.last_seen
+  );
+
+
+  // ===================================================
+  // LEVEL
+  // ===================================================
+
+  updateLevel(
+    percentage
+  );
+
+
+  // ===================================================
+  // FULL NOTIFICATION
+  // ===================================================
+
+  checkFullNotification(
+    percentage,
+    status
+  );
+
+}
+
+
+// =====================================================
+// ESP32 ONLINE / OFFLINE
+// =====================================================
+
+function checkESP32Status(
+  lastSeen
+) {
+
+
+  const systemStatus =
+    document.getElementById(
+      "system-status"
+    );
+
+
+  const liveText =
+    document.getElementById(
+      "live-text"
+    );
+
+
+  const espStatus =
+    document.getElementById(
+      "esp-status"
+    );
+
+
+  const lastSeenElement =
+    document.getElementById(
+      "last-seen"
+    );
+
+
+  // No last_seen value
+
+  if (
+    lastSeen === undefined ||
+    lastSeen === null ||
+    lastSeen === ""
+  ) {
+
+    setESP32Offline();
+
+    lastSeenElement.textContent =
+      "No data";
+
+    return;
+
+  }
+
+
+  let timestamp =
+    Number(
+      lastSeen
+    );
+
+
+  if (
+    isNaN(timestamp)
+  ) {
+
+    setESP32Offline();
+
+    lastSeenElement.textContent =
+      "Invalid";
+
+    return;
+
+  }
+
+
+  // Firebase server timestamp
+  // normally uses milliseconds.
+
+  if (
+    timestamp < 10000000000
+  ) {
+
+    timestamp *=
+      1000;
+
+  }
+
+
+  const now =
+    Date.now();
+
+
+  const age =
+    now - timestamp;
+
+
+  // ===================================================
+  // ONLINE
+  // ===================================================
+
+  if (
+    age >= 0 &&
+    age <= ONLINE_TIMEOUT
+  ) {
+
+
+    systemStatus.textContent =
+      "ONLINE";
+
+
+    systemStatus.className =
+      "online";
+
+
+    liveText.textContent =
+      "● ESP32 ONLINE";
+
+
+    liveText.className =
+      "live online";
+
+
+    espStatus.textContent =
+      "ONLINE";
+
+
+    espStatus.className =
+      "online";
+
+
+  }
+
+
+  // ===================================================
+  // OFFLINE
+  // ===================================================
+
+  else {
+
+
+    setESP32Offline();
+
+  }
+
+
+  // ===================================================
+  // LAST SEEN DISPLAY
+  // ===================================================
+
+  const date =
+    new Date(
+      timestamp
+    );
+
+
+  if (
+    !isNaN(
+      date.getTime()
+    )
+  ) {
+
+    lastSeenElement.textContent =
+      date.toLocaleTimeString();
+
+  }
+
+}
+
+
+// =====================================================
+// SET OFFLINE
+// =====================================================
+
+function setESP32Offline() {
+
+
+  document.getElementById(
+    "system-status"
+  ).textContent =
+    "OFFLINE";
+
+
+  document.getElementById(
+    "system-status"
+  ).className =
+    "offline";
+
+
+  document.getElementById(
+    "live-text"
+  ).textContent =
+    "● ESP32 OFFLINE";
+
+
+  document.getElementById(
+    "live-text"
+  ).className =
+    "live offline";
+
+
+  document.getElementById(
+    "esp-status"
+  ).textContent =
+    "OFFLINE";
+
+
+  document.getElementById(
+    "esp-status"
+  ).className =
+    "offline";
+
+}
+
+
+// =====================================================
+// CHECK LAST_SEEN EVERY SECOND
+// =====================================================
+
+setInterval(
+
+  function() {
+
+
+    if (
+      lastSeenValue !== null
+    ) {
+
+      checkESP32Status(
+        lastSeenValue
+      );
+
+    }
+
+  },
+
+  1000
+
+);
+
+
+// =====================================================
+// LEVEL DISPLAY
+// =====================================================
+
+function updateLevel(
+  percentage
+) {
+
+
+  let level;
+
+
+  if (
+    percentage >= 85
+  ) {
+
+    level =
+      "full";
+
+  }
+
+  else if (
+    percentage >= 65
+  ) {
+
+    level =
+      "high";
+
+  }
+
+  else if (
+    percentage >= 40
+  ) {
+
+    level =
+      "medium";
+
+  }
+
+  else if (
+    percentage >= 20
+  ) {
+
+    level =
+      "low";
+
+  }
+
+  else {
+
+    level =
+      "empty";
+
+  }
+
+
+  const levels = [
+
+    "empty",
+    "low",
+    "medium",
+    "high",
+    "full"
+
+  ];
+
+
+  const currentIndex =
+    levels.indexOf(
+      level
+    );
+
+
+  document
+    .querySelectorAll(
+      ".rung"
+    )
+    .forEach(
+      function(rung) {
+
+
+        const rungIndex =
+          levels.indexOf(
+            rung.dataset.level
+          );
+
+
+        rung.classList.toggle(
+
+          "active",
+
+          rungIndex <=
+          currentIndex
+
+        );
+
+      }
+    );
+
+
+  // ===================================================
+  // BIN COLOR
+  // ===================================================
+
+  const bin =
+    document.getElementById(
+      "bin-fill"
+    );
+
+
+  if (
+    level === "full"
+  ) {
+
+    bin.style.background =
+      "var(--red)";
+
+  }
+
+  else if (
+    level === "high"
+  ) {
+
+    bin.style.background =
+      "var(--orange)";
+
+  }
+
+  else if (
+    level === "medium"
+  ) {
+
+    bin.style.background =
+      "var(--yellow)";
+
+  }
+
+  else if (
+    level === "low"
+  ) {
+
+    bin.style.background =
+      "var(--low)";
+
+  }
+
+  else {
+
+    bin.style.background =
+      "var(--green)";
+
+  }
+
+
+  bin.style.height =
+    percentage + "%";
+
+
+  // ===================================================
+  // CARD BORDER
+  // ===================================================
+
+  const card =
+    document.getElementById(
+      "binCard"
+    );
+
+
+  if (
+    level === "full"
+  ) {
+
+    card.style.borderLeftColor =
+      "var(--red)";
+
+  }
+
+  else if (
+    level === "high"
+  ) {
+
+    card.style.borderLeftColor =
+      "var(--orange)";
+
+  }
+
+  else if (
+    level === "medium"
+  ) {
+
+    card.style.borderLeftColor =
+      "var(--yellow)";
+
+  }
+
+  else if (
+    level === "low"
+  ) {
+
+    card.style.borderLeftColor =
+      "var(--low)";
+
+  }
+
+  else {
+
+    card.style.borderLeftColor =
+      "var(--green)";
+
+  }
+
+}
+
+
+// =====================================================
+// FULL BIN NOTIFICATION
+// =====================================================
+
+function checkFullNotification(
+  percentage,
+  status
+) {
+
+
+  const isFull =
+    percentage >= 85 ||
+    status === "FULL";
+
+
+  const alert =
+    document.getElementById(
+      "alert"
+    );
+
+
+  if (
+    isFull
+  ) {
+
+
+    alert.style.display =
+      "block";
+
+
+    if (
+      !fullNotificationSent
+    ) {
+
+
+      fullNotificationSent =
+        true;
+
+
+      if (
+        notificationEnabled &&
+        Notification.permission ===
+        "granted"
+      ) {
+
+
+        new Notification(
+          "🚨 Trash Bin Full",
+          {
+
+            body:
+              "Floor 1 trash bin is full. Please empty the bin."
+
+          }
+
+        );
+
+      }
+
+    }
+
+  }
+
+  else {
+
+
+    alert.style.display =
+      "none";
+
+
+    fullNotificationSent =
+      false;
+
+  }
+
+}
+
+
+// =====================================================
 // CLOCK
 // =====================================================
 
-function updateClock(){
+function updateClock() {
+
 
   document.getElementById(
     "clock"
   ).textContent =
-    new Date().toLocaleTimeString();
+    new Date()
+      .toLocaleTimeString();
 
 }
 
@@ -1635,6 +1535,36 @@ setInterval(
 
 updateClock();
 
+
+// =====================================================
+// NOTIFICATION PERMISSION
+// =====================================================
+
+if (
+  "Notification" in window &&
+  Notification.permission ===
+  "granted"
+) {
+
+
+  notificationEnabled =
+    true;
+
+
+  const button =
+    document.getElementById(
+      "notificationBtn"
+    );
+
+
+  button.textContent =
+    "Notifications Enabled";
+
+
+  button.disabled =
+    true;
+
+}
 
 </script>
 
