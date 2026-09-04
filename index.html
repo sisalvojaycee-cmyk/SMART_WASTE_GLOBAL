@@ -1,2006 +1,693 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
 <meta charset="UTF-8">
-
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BINWATCH | Smart Trash Monitor</title>
 
-
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
-
 <style>
-
 :root {
-
     --bg: #08100c;
     --panel: #101a15;
     --panel2: #17221c;
     --border: #26372e;
-
     --text: #eaf3ec;
     --muted: #82988c;
-
     --green: #35d488;
     --yellow: #f0b429;
     --orange: #ff7a3c;
     --red: #ff4757;
-
 }
 
-
-* {
-    box-sizing: border-box;
-}
-
+* { box-sizing: border-box; }
 
 body {
-
     margin: 0;
-
-    background:
-        radial-gradient(
-            circle at top,
-            #14251c,
-            var(--bg) 45%
-        );
-
+    background: radial-gradient(circle at top, #14251c, var(--bg) 45%);
     color: var(--text);
-
-    font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
-
+    font-family: Arial, Helvetica, sans-serif;
 }
 
-
-.container {
-
-    width: min(
-        1200px,
-        94%
-    );
-
-    margin: auto;
-
-}
-
+.container { width: min(1200px, 94%); margin: auto; }
 
 /* HEADER */
-
 header {
-
-    border-bottom:
-        1px solid var(--border);
-
-    background:
-        rgba(8,16,12,.95);
-
-    position:
-        sticky;
-
+    border-bottom: 1px solid var(--border);
+    background: rgba(8,16,12,.95);
+    position: sticky;
     top: 0;
-
     z-index: 10;
-
 }
-
 
 .header {
-
     min-height: 75px;
-
     display: flex;
-
     align-items: center;
-
-    justify-content:
-        space-between;
-
+    justify-content: space-between;
     gap: 20px;
-
 }
 
-
-.logo {
-
-    font-size: 25px;
-
-    font-weight: 900;
-
-    letter-spacing: 1px;
-
-}
-
-
-.logo span {
-
-    color:
-        var(--green);
-
-}
-
-
-.subtitle {
-
-    color:
-        var(--muted);
-
-    font-size: 11px;
-
-    margin-top: 4px;
-
-}
-
+.logo { font-size: 25px; font-weight: 900; letter-spacing: 1px; }
+.logo span { color: var(--green); }
+.subtitle { color: var(--muted); font-size: 11px; margin-top: 4px; }
 
 .header-right {
-
     display: flex;
-
     align-items: center;
-
     gap: 15px;
-
     flex-wrap: wrap;
-
 }
 
-
-.system {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 8px;
-
-    font-size: 12px;
-
-}
-
+.system { display: flex; align-items: center; gap: 8px; font-size: 12px; }
 
 .dot {
-
     width: 9px;
-
     height: 9px;
-
     border-radius: 50%;
-
-    background:
-        var(--muted);
-
+    background: var(--muted);
 }
-
 
 .dot.online {
-
-    background:
-        var(--green);
-
-    box-shadow:
-        0 0 12px
-        rgba(53,212,136,.6);
-
+    background: var(--green);
+    box-shadow: 0 0 12px rgba(53,212,136,.6);
 }
 
+.dot.offline { background: var(--red); }
 
-.dot.offline {
-
-    background:
-        var(--red);
-
-}
-
-
-.clock {
-
-    color:
-        var(--muted);
-
-    font-size: 12px;
-
-}
-
+.clock { color: var(--muted); font-size: 12px; }
 
 button {
-
-    border:
-        1px solid var(--border);
-
-    background:
-        var(--panel2);
-
-    color:
-        var(--text);
-
-    padding:
-        9px 13px;
-
-    border-radius:
-        9px;
-
-    cursor:
-        pointer;
-
-    font-weight:
-        700;
-
+    border: 1px solid var(--border);
+    background: var(--panel2);
+    color: var(--text);
+    padding: 9px 13px;
+    border-radius: 9px;
+    cursor: pointer;
+    font-weight: 700;
 }
 
-
-button:hover {
-
-    border-color:
-        var(--green);
-
-}
-
+button:hover { border-color: var(--green); }
 
 /* MAIN */
-
-main {
-
-    padding:
-        35px 0 50px;
-
-}
-
-
-.title {
-
-    margin-bottom:
-        25px;
-
-}
-
-
-.title h1 {
-
-    margin: 0;
-
-    font-size:
-        30px;
-
-}
-
-
-.title p {
-
-    color:
-        var(--muted);
-
-    margin-top:
-        7px;
-
-}
-
+main { padding: 35px 0 50px; }
+.title { margin-bottom: 25px; }
+.title h1 { margin: 0; font-size: 30px; }
+.title p { color: var(--muted); margin-top: 7px; }
 
 /* ALERT */
-
 .alert {
-
-    display:
-        none;
-
-    border:
-        1px solid
-        rgba(255,71,87,.45);
-
-    background:
-        rgba(255,71,87,.10);
-
-    border-radius:
-        13px;
-
-    padding:
-        16px;
-
-    margin-bottom:
-        22px;
-
+    display: none;
+    border: 1px solid rgba(255,71,87,.45);
+    background: rgba(255,71,87,.10);
+    border-radius: 13px;
+    padding: 16px;
+    margin-bottom: 22px;
 }
 
-
-.alert.show {
-
-    display:
-        block;
-
-}
-
+.alert.show { display: block; }
 
 .alert-title {
-
-    color:
-        var(--red);
-
-    font-weight:
-        900;
-
-    margin-bottom:
-        5px;
-
+    color: var(--red);
+    font-weight: 900;
+    margin-bottom: 5px;
 }
-
 
 /* GRID */
-
 .grid {
-
-    display:
-        grid;
-
-    grid-template-columns:
-        repeat(2, 1fr);
-
-    gap:
-        22px;
-
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 22px;
 }
-
 
 /* CARD */
-
 .card {
-
-    background:
-        linear-gradient(
-            145deg,
-            var(--panel),
-            #0d1611
-        );
-
-    border:
-        1px solid var(--border);
-
-    border-radius:
-        18px;
-
-    padding:
-        22px;
-
-    box-shadow:
-        0 15px 45px
-        rgba(0,0,0,.25);
-
+    background: linear-gradient(145deg, var(--panel), #0d1611);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 22px;
+    box-shadow: 0 15px 45px rgba(0,0,0,.25);
 }
-
 
 .card-header {
-
-    display:
-        flex;
-
-    justify-content:
-        space-between;
-
-    align-items:
-        center;
-
-    margin-bottom:
-        22px;
-
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 22px;
 }
 
-
-.bin-name {
-
-    font-size:
-        21px;
-
-    font-weight:
-        900;
-
-}
-
-
-.location {
-
-    color:
-        var(--muted);
-
-    font-size:
-        11px;
-
-    margin-top:
-        4px;
-
-}
-
+.bin-name { font-size: 21px; font-weight: 900; }
+.location { color: var(--muted); font-size: 11px; margin-top: 4px; }
 
 .badge {
-
-    padding:
-        7px 11px;
-
-    border-radius:
-        20px;
-
-    font-size:
-        10px;
-
-    font-weight:
-        900;
-
-    color:
-        var(--green);
-
-    background:
-        rgba(53,212,136,.1);
-
+    padding: 7px 11px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 900;
+    color: var(--green);
+    background: rgba(53,212,136,.1);
 }
 
-
-.badge.full {
-
-    color:
-        var(--red);
-
-    background:
-        rgba(255,71,87,.12);
-
-}
-
-
-.badge.high {
-
-    color:
-        var(--orange);
-
-    background:
-        rgba(255,122,60,.12);
-
-}
-
-
-.badge.medium {
-
-    color:
-        var(--yellow);
-
-    background:
-        rgba(240,180,41,.12);
-
-}
-
-
-.badge.offline {
-
-    color:
-        var(--red);
-
-    background:
-        rgba(255,71,87,.12);
-
-}
-
+.badge.full { color: var(--red); background: rgba(255,71,87,.12); }
+.badge.high { color: var(--orange); background: rgba(255,122,60,.12); }
+.badge.medium { color: var(--yellow); background: rgba(240,180,41,.12); }
+.badge.offline { color: var(--red); background: rgba(255,71,87,.12); }
 
 /* BIN BODY */
-
 .bin-body {
-
-    display:
-        grid;
-
-    grid-template-columns:
-        150px 1fr;
-
-    gap:
-        25px;
-
-    align-items:
-        center;
-
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    gap: 25px;
+    align-items: center;
 }
-
 
 /* BIN */
-
-.visual {
-
-    text-align:
-        center;
-
-}
-
+.visual { text-align: center; }
 
 .trash {
-
-    width:
-        90px;
-
-    height:
-        120px;
-
-    margin:
-        auto;
-
-    position:
-        relative;
-
-    overflow:
-        hidden;
-
-    background:
-        #1d2a22;
-
-    border:
-        4px solid #53685a;
-
-    border-top:
-        none;
-
-    border-radius:
-        5px 5px 18px 18px;
-
+    width: 90px;
+    height: 120px;
+    margin: auto;
+    position: relative;
+    overflow: hidden;
+    background: #1d2a22;
+    border: 4px solid #53685a;
+    border-top: none;
+    border-radius: 5px 5px 18px 18px;
 }
-
 
 .trash:before {
-
-    content:
-        "";
-
-    position:
-        absolute;
-
-    top:
-        -8px;
-
-    left:
-        -7px;
-
-    width:
-        96px;
-
-    height:
-        10px;
-
-    background:
-        #53685a;
-
-    border-radius:
-        5px;
-
+    content: "";
+    position: absolute;
+    top: -8px;
+    left: -7px;
+    width: 96px;
+    height: 10px;
+    background: #53685a;
+    border-radius: 5px;
 }
-
 
 .fill {
-
-    position:
-        absolute;
-
-    bottom:
-        0;
-
-    left:
-        0;
-
-    width:
-        100%;
-
-    height:
-        0%;
-
-    background:
-        var(--green);
-
-    transition:
-        height .5s ease;
-
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 0%;
+    background: var(--green);
+    transition: height .5s ease;
 }
 
-
-.percent {
-
-    font-size:
-        30px;
-
-    font-weight:
-        900;
-
-    margin-top:
-        10px;
-
-}
-
-
-.percent-label {
-
-    color:
-        var(--muted);
-
-    font-size:
-        10px;
-
-}
-
+.percent { font-size: 30px; font-weight: 900; margin-top: 10px; }
+.percent-label { color: var(--muted); font-size: 10px; }
 
 /* DATA */
-
-.data {
-
-    display:
-        grid;
-
-    gap:
-        11px;
-
-}
-
+.data { display: grid; gap: 11px; }
 
 .row {
-
-    display:
-        flex;
-
-    justify-content:
-        space-between;
-
-    border-bottom:
-        1px solid var(--border);
-
-    padding-bottom:
-        9px;
-
-    gap:
-        10px;
-
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 9px;
+    gap: 10px;
 }
 
-
-.label {
-
-    color:
-        var(--muted);
-
-    font-size:
-        12px;
-
-}
-
-
-.value {
-
-    font-size:
-        12px;
-
-    font-weight:
-        800;
-
-    text-align:
-        right;
-
-}
-
+.label { color: var(--muted); font-size: 12px; }
+.value { font-size: 12px; font-weight: 800; text-align: right; }
 
 /* PROGRESS */
-
-.level {
-
-    margin-top:
-        22px;
-
-}
-
+.level { margin-top: 22px; }
 
 .level-top {
-
-    display:
-        flex;
-
-    justify-content:
-        space-between;
-
-    margin-bottom:
-        8px;
-
-    color:
-        var(--muted);
-
-    font-size:
-        11px;
-
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    color: var(--muted);
+    font-size: 11px;
 }
-
 
 .progress {
-
-    height:
-        8px;
-
-    background:
-        #243229;
-
-    border-radius:
-        10px;
-
-    overflow:
-        hidden;
-
+    height: 8px;
+    background: #243229;
+    border-radius: 10px;
+    overflow: hidden;
 }
-
 
 .progress-bar {
-
-    width:
-        0%;
-
-    height:
-        100%;
-
-    background:
-        var(--green);
-
-    transition:
-        width .5s ease;
-
+    width: 0%;
+    height: 100%;
+    background: var(--green);
+    transition: width .5s ease;
 }
-
 
 /* FOOTER */
-
 footer {
-
-    border-top:
-        1px solid var(--border);
-
-    padding:
-        20px 0;
-
-    color:
-        var(--muted);
-
-    font-size:
-        11px;
-
+    border-top: 1px solid var(--border);
+    padding: 20px 0;
+    color: var(--muted);
+    font-size: 11px;
 }
 
-
-.footer {
-
-    display:
-        flex;
-
-    justify-content:
-        space-between;
-
-    gap:
-        15px;
-
-}
-
+.footer { display: flex; justify-content: space-between; gap: 15px; }
 
 /* MOBILE */
-
 @media(max-width:800px) {
-
-    .grid {
-
-        grid-template-columns:
-            1fr;
-
-    }
-
+    .grid { grid-template-columns: 1fr; }
 }
-
 
 @media(max-width:600px) {
-
     .header {
-
-        flex-direction:
-            column;
-
-        align-items:
-            flex-start;
-
-        padding:
-            15px 0;
-
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 15px 0;
     }
-
-
-    .bin-body {
-
-        grid-template-columns:
-            1fr;
-
-    }
-
-
-    .header-right {
-
-        width:
-            100%;
-
-        justify-content:
-            space-between;
-
-    }
-
-
-    .footer {
-
-        flex-direction:
-            column;
-
-    }
-
+    .bin-body { grid-template-columns: 1fr; }
+    .header-right { width: 100%; justify-content: space-between; }
+    .footer { flex-direction: column; }
 }
-
 </style>
-
 </head>
-
 
 <body>
 
-
 <header>
-
 <div class="container header">
 
+    <div>
+        <div class="logo">BIN<span>WATCH</span></div>
+        <div class="subtitle">FACILITY IoT · ESP32 SMART TRASH MONITOR</div>
+    </div>
 
-<div>
-
-<div class="logo">
-BIN<span>WATCH</span>
-</div>
-
-<div class="subtitle">
-FACILITY IoT · ESP32 SMART TRASH MONITOR
-</div>
-
-</div>
-
-
-<div class="header-right">
-
-
-<div class="system">
-
-<span
-    id="systemDot"
-    class="dot"
-</span>
-
-
-<span id="systemText">
-Checking...
-</span>
+    <div class="header-right">
+        <div class="system">
+            <span id="systemDot" class="dot"></span>
+            <span id="systemText">Checking...</span>
+        </div>
+        <div id="clock" class="clock">--:--:--</div>
+        <button onclick="enableNotifications()">Enable Notifications</button>
+    </div>
 
 </div>
-
-
-<div id="clock" class="clock">
---:--:--
-</div>
-
-
-<button onclick="enableNotifications()">
-Enable Notifications
-</button>
-
-
-</div>
-
-</div>
-
 </header>
-
 
 <main class="container">
 
-
 <div class="title">
-
-<h1>
-Trash Bin Monitoring
-</h1>
-
-<p>
-Real-time monitoring for Bin 1 and Bin 2.
-</p>
-
+    <h1>Trash Bin Monitoring</h1>
+    <p>Real-time monitoring for Bin 1 and Bin 2.</p>
 </div>
 
-
-<div
-    id="fullAlert"
-    class="alert"
-
-
-<div class="alert-title">
-⚠ TRASH BIN ALERT
+<div id="fullAlert" class="alert">
+    <div class="alert-title">⚠ TRASH BIN ALERT</div>
+    <div id="fullAlertText">No bins are full.</div>
 </div>
-
-<div id="fullAlertText">
-No bins are full.
-</div>
-
-</div>
-
 
 <div class="grid">
 
+    <!-- BIN 1 -->
+    <div class="card">
+        <div class="card-header">
+            <div>
+                <div class="bin-name">Bin 1</div>
+                <div class="location">Floor 1</div>
+            </div>
+            <div id="badge-bin1" class="badge">NORMAL</div>
+        </div>
 
-<!-- BIN 1 -->
+        <div class="bin-body">
+            <div class="visual">
+                <div class="trash">
+                    <div id="fill-bin1" class="fill"></div>
+                </div>
+                <div id="percent-bin1" class="percent">0%</div>
+                <div class="percent-label">FILL LEVEL</div>
+            </div>
 
-<div class="card">
+            <div class="data">
+                <div class="row">
+                    <span class="label">Distance</span>
+                    <span id="distance-bin1" class="value">-- cm</span>
+                </div>
+                <div class="row">
+                    <span class="label">Fill</span>
+                    <span id="filltext-bin1" class="value">0%</span>
+                </div>
+                <div class="row">
+                    <span class="label">ESP32</span>
+                    <span id="esp-bin1" class="value">CHECKING</span>
+                </div>
+                <div class="row">
+                    <span class="label">Last Seen</span>
+                    <span id="last-bin1" class="value">Waiting...</span>
+                </div>
+            </div>
+        </div>
 
-<div class="card-header">
+        <div class="level">
+            <div class="level-top">
+                <span>Fill Level</span>
+                <span id="status-bin1">NORMAL</span>
+            </div>
+            <div class="progress">
+                <div id="progress-bin1" class="progress-bar"></div>
+            </div>
+        </div>
+    </div>
 
-<div>
+    <!-- BIN 2 -->
+    <div class="card">
+        <div class="card-header">
+            <div>
+                <div class="bin-name">Bin 2</div>
+                <div class="location">Floor 1</div>
+            </div>
+            <div id="badge-bin2" class="badge">NORMAL</div>
+        </div>
 
-<div class="bin-name">
-Bin 1
-</div>
+        <div class="bin-body">
+            <div class="visual">
+                <div class="trash">
+                    <div id="fill-bin2" class="fill"></div>
+                </div>
+                <div id="percent-bin2" class="percent">0%</div>
+                <div class="percent-label">FILL LEVEL</div>
+            </div>
 
-<div class="location">
-Floor 1
-</div>
+            <div class="data">
+                <div class="row">
+                    <span class="label">Distance</span>
+                    <span id="distance-bin2" class="value">-- cm</span>
+                </div>
+                <div class="row">
+                    <span class="label">Fill</span>
+                    <span id="filltext-bin2" class="value">0%</span>
+                </div>
+                <div class="row">
+                    <span class="label">ESP32</span>
+                    <span id="esp-bin2" class="value">CHECKING</span>
+                </div>
+                <div class="row">
+                    <span class="label">Last Seen</span>
+                    <span id="last-bin2" class="value">Waiting...</span>
+                </div>
+            </div>
+        </div>
 
-</div>
-
-
-<div
-    id="badge-bin1"
-    class="badge"
-
-NORMAL
-</div>
-
-</div>
-
-
-<div class="bin-body">
-
-
-<div class="visual">
-
-<div class="trash">
-
-<div
-    id="fill-bin1"
-    class="fill"
-</div>
-
-
-</div>
-
-
-<div
-    id="percent-bin1"
-    class="percent"
-
-0%
-</div>
-
-
-<div class="percent-label">
-FILL LEVEL
-</div>
-
-</div>
-
-
-<div class="data">
-
-
-<div class="row">
-
-<span class="label">
-Distance
-</span>
-
-<span
-    id="distance-bin1"
-    class="value"
-
--- cm
-</span>
-
-</div>
-
-
-<div class="row">
-
-<span class="label">
-Fill
-</span>
-
-<span
-    id="filltext-bin1"
-    class="value"
-
-0%
-</span>
-
-</div>
-
-
-<div class="row">
-
-<span class="label">
-ESP32
-</span>
-
-<span
-    id="esp-bin1"
-    class="value"
-
-CHECKING
-</span>
+        <div class="level">
+            <div class="level-top">
+                <span>Fill Level</span>
+                <span id="status-bin2">NORMAL</span>
+            </div>
+            <div class="progress">
+                <div id="progress-bin2" class="progress-bar"></div>
+            </div>
+        </div>
+    </div>
 
 </div>
-
-
-<div class="row">
-
-<span class="label">
-Last Seen
-</span>
-
-<span
-    id="last-bin1"
-    class="value"
-
-Waiting...
-</span>
-
-</div>
-
-
-</div>
-
-</div>
-
-
-<div class="level">
-
-<div class="level-top">
-
-<span>
-Fill Level
-</span>
-
-<span id="status-bin1">
-NORMAL
-</span>
-
-</div>
-
-
-<div class="progress">
-
-<div
-    id="progress-bin1"
-    class="progress-bar"
-</div>
-
-
-</div>
-
-</div>
-
-</div>
-
-
-<!-- BIN 2 -->
-
-<div class="card">
-
-<div class="card-header">
-
-<div>
-
-<div class="bin-name">
-Bin 2
-</div>
-
-<div class="location">
-Floor 1
-</div>
-
-</div>
-
-
-<div
-    id="badge-bin2"
-    class="badge"
-
-NORMAL
-</div>
-
-</div>
-
-
-<div class="bin-body">
-
-
-<div class="visual">
-
-<div class="trash">
-
-<div
-    id="fill-bin2"
-    class="fill"
-</div>
-
-
-</div>
-
-
-<div
-    id="percent-bin2"
-    class="percent"
-
-0%
-</div>
-
-
-<div class="percent-label">
-FILL LEVEL
-</div>
-
-</div>
-
-
-<div class="data">
-
-
-<div class="row">
-
-<span class="label">
-Distance
-</span>
-
-<span
-    id="distance-bin2"
-    class="value"
-
--- cm
-</span>
-
-</div>
-
-
-<div class="row">
-
-<span class="label">
-Fill
-</span>
-
-<span
-    id="filltext-bin2"
-    class="value"
-
-0%
-</span>
-
-</div>
-
-
-<div class="row">
-
-<span class="label">
-ESP32
-</span>
-
-<span
-    id="esp-bin2"
-    class="value"
-
-CHECKING
-</span>
-
-</div>
-
-
-<div class="row">
-
-<span class="label">
-Last Seen
-</span>
-
-<span
-    id="last-bin2"
-    class="value"
-
-Waiting...
-</span>
-
-</div>
-
-
-</div>
-
-</div>
-
-
-<div class="level">
-
-<div class="level-top">
-
-<span>
-Fill Level
-</span>
-
-<span id="status-bin2">
-NORMAL
-</span>
-
-</div>
-
-
-<div class="progress">
-
-<div
-    id="progress-bin2"
-    class="progress-bar"
-</div>
-
-
-</div>
-
-</div>
-
-</div>
-
-
-</div>
-
 </main>
 
-
 <footer>
-
 <div class="container footer">
-
-<div>
-BINWATCH · Smart Trash Monitoring System
+    <div>BINWATCH · Smart Trash Monitoring System</div>
+    <div id="firebaseStatus">Firebase: Connecting...</div>
 </div>
-
-<div id="firebaseStatus">
-Firebase: Connecting...
-</div>
-
-</div>
-
 </footer>
 
-
 <script>
-
 /* ==================================================
    FIREBASE CONFIG
 ================================================== */
-
 const firebaseConfig = {
-
-    apiKey:
-        "AIzaSyBYaa4a2dfSPHQ7-j1rkSG-CaA6bv0EV-0",
-
-    authDomain:
-        "trashbin-monitor-e8c8c.firebaseapp.com",
-
-    databaseURL:
-        "https://trashbin-monitor-e8c8c-default-rtdb.asia-southeast1.firebasedatabase.app",
-
-    projectId:
-        "trashbin-monitor-e8c8c",
-
-    storageBucket:
-        "trashbin-monitor-e8c8c.firebasestorage.app",
-
-    messagingSenderId:
-        "826754260785",
-
-    appId:
-        "1:826754260785:web:ce154310017a5c9b7bda10"
-
+    apiKey: "AIzaSyBYaa4a2dfSPHQ7-j1rkSG-CaA6bv0EV-0",
+    authDomain: "trashbin-monitor-e8c8c.firebaseapp.com",
+    databaseURL: "https://trashbin-monitor-e8c8c-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "trashbin-monitor-e8c8c",
+    storageBucket: "trashbin-monitor-e8c8c.firebasestorage.app",
+    messagingSenderId: "826754260785",
+    appId: "1:826754260785:web:ce154310017a5c9b7bda10"
 };
-
 
 /* ==================================================
    FIREBASE
 ================================================== */
-
-firebase.initializeApp(
-    firebaseConfig
-);
-
-const auth =
-    firebase.auth();
-
-const db =
-    firebase.database();
-
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
 
 /* ==================================================
    SETTINGS
 ================================================== */
-
-const ONLINE_TIMEOUT =
-    15000;
-
-const FULL_LEVEL =
-    90;
-
+const ONLINE_TIMEOUT = 15000;
+const FULL_LEVEL = 90;
 
 /* ==================================================
    STATE
 ================================================== */
-
-const lastUpdate = {
-
-    bin1: 0,
-
-    bin2: 0
-
-};
-
-
-const binData = {
-
-    bin1: {},
-
-    bin2: {}
-
-};
-
-
-const fullState = {
-
-    bin1: false,
-
-    bin2: false
-
-};
-
+const lastUpdate = { bin1: 0, bin2: 0 };
+const binData = { bin1: {}, bin2: {} };
+const fullState = { bin1: false, bin2: false };
 
 /* ==================================================
    FIREBASE LOGIN
+   NOTE: signing in with a hardcoded email/password on the
+   client exposes those credentials to anyone who views the
+   page source. Switched to anonymous auth here — pair this
+   with Firebase Realtime Database security rules that only
+   allow reads (and restrict writes to your ESP32 devices)
+   for real protection.
 ================================================== */
-
-auth.signInWithEmailAndPassword(
-    "trashbin@gmail.com",
-    "trash123"
-)
-
-.then(() => {
-
-    console.log(
-        "Website Firebase login successful"
-    );
-
-    document.getElementById(
-        "firebaseStatus"
-    ).textContent =
-        "Firebase: Connected";
-
-})
-
-.catch(error => {
-
-    console.error(
-        "Firebase login error:",
-        error
-    );
-
-    document.getElementById(
-        "firebaseStatus"
-    ).textContent =
-        "Firebase: Login failed";
-
-});
-
+auth.signInAnonymously()
+    .then(() => {
+        console.log("Website Firebase login successful");
+        document.getElementById("firebaseStatus").textContent = "Firebase: Connected";
+    })
+    .catch(error => {
+        console.error("Firebase login error:", error);
+        document.getElementById("firebaseStatus").textContent = "Firebase: Login failed";
+    });
 
 /* ==================================================
    BIN 1
 ================================================== */
-
-db.ref("/bin1").on(
-    "value",
-    snapshot => {
-
-        const data =
-            snapshot.val() || {};
-
-        binData.bin1 =
-            data;
-
-        lastUpdate.bin1 =
-            Date.now();
-
-        updateBin(
-            "bin1",
-            data
-        );
-
-        updateAlerts();
-
-    },
-
-    error => {
-
-        console.error(
-            "Bin 1 error:",
-            error
-        );
-
-    }
-);
-
+db.ref("/bin1").on("value", snapshot => {
+    const data = snapshot.val() || {};
+    binData.bin1 = data;
+    lastUpdate.bin1 = Date.now();
+    updateBin("bin1", data);
+    updateAlerts();
+}, error => {
+    console.error("Bin 1 error:", error);
+});
 
 /* ==================================================
    BIN 2
 ================================================== */
-
-db.ref("/bin2").on(
-    "value",
-    snapshot => {
-
-        const data =
-            snapshot.val() || {};
-
-        binData.bin2 =
-            data;
-
-        lastUpdate.bin2 =
-            Date.now();
-
-        updateBin(
-            "bin2",
-            data
-        );
-
-        updateAlerts();
-
-    },
-
-    error => {
-
-        console.error(
-            "Bin 2 error:",
-            error
-        );
-
-    }
-);
-
+db.ref("/bin2").on("value", snapshot => {
+    const data = snapshot.val() || {};
+    binData.bin2 = data;
+    lastUpdate.bin2 = Date.now();
+    updateBin("bin2", data);
+    updateAlerts();
+}, error => {
+    console.error("Bin 2 error:", error);
+});
 
 /* ==================================================
    UPDATE BIN
 ================================================== */
+function updateBin(bin, data) {
+    const distance = Number(data.distance || 0);
 
-function updateBin(
-    bin,
-    data
-) {
+    const fill = Math.max(0, Math.min(100, Number(data.fillpercentage || 0)));
 
-    const distance =
-        Number(
-            data.distance || 0
-        );
+    const status = data.status || getStatus(fill);
 
+    document.getElementById("distance-" + bin).textContent =
+        distance > 0 ? distance.toFixed(1) + " cm" : "-- cm";
 
-    const fill =
-        Math.max(
-            0,
-            Math.min(
-                100,
-                Number(
-                    data.fillpercentage || 0
-                )
-            )
-        );
+    document.getElementById("percent-" + bin).textContent = fill + "%";
+    document.getElementById("filltext-" + bin).textContent = fill + "%";
+    document.getElementById("fill-" + bin).style.height = fill + "%";
+    document.getElementById("progress-" + bin).style.width = fill + "%";
+    document.getElementById("status-" + bin).textContent = status;
 
-
-    const status =
-        data.status ||
-        getStatus(fill);
-
-
-    document.getElementById(
-        "distance-" + bin
-    ).textContent =
-        distance > 0
-        ? distance.toFixed(1) + " cm"
-        : "-- cm";
-
-
-    document.getElementById(
-        "percent-" + bin
-    ).textContent =
-        fill + "%";
-
-
-    document.getElementById(
-        "filltext-" + bin
-    ).textContent =
-        fill + "%";
-
-
-    document.getElementById(
-        "fill-" + bin
-    ).style.height =
-        fill + "%";
-
-
-    document.getElementById(
-        "progress-" + bin
-    ).style.width =
-        fill + "%";
-
-
-    document.getElementById(
-        "status-" + bin
-    ).textContent =
-        status;
-
-
-    const badge =
-        document.getElementById(
-            "badge-" + bin
-        );
-
-
-    badge.className =
-        "badge";
-
-
-    badge.textContent =
-        status;
-
+    const badge = document.getElementById("badge-" + bin);
+    badge.className = "badge";
+    badge.textContent = status;
 
     if (fill >= 90) {
-
-        badge.classList.add(
-            "full"
-        );
-
+        badge.classList.add("full");
     } else if (fill >= 70) {
-
-        badge.classList.add(
-            "high"
-        );
-
+        badge.classList.add("high");
     } else if (fill >= 40) {
-
-        badge.classList.add(
-            "medium"
-        );
-
+        badge.classList.add("medium");
     }
 
-
-    updateOnlineStatus(
-        bin
-    );
-
+    updateOnlineStatus(bin);
 }
-
 
 /* ==================================================
    ONLINE STATUS
 ================================================== */
+function updateOnlineStatus(bin) {
+    const age = Date.now() - lastUpdate[bin];
+    const online = lastUpdate[bin] > 0 && age <= ONLINE_TIMEOUT;
 
-function updateOnlineStatus(
-    bin
-) {
-
-    const age =
-        Date.now() -
-        lastUpdate[bin];
-
-
-    const online =
-        lastUpdate[bin] > 0 &&
-        age <= ONLINE_TIMEOUT;
-
-
-    const esp =
-        document.getElementById(
-            "esp-" + bin
-        );
-
-
-    const last =
-        document.getElementById(
-            "last-" + bin
-        );
-
-
-    const badge =
-        document.getElementById(
-            "badge-" + bin
-        );
-
+    const esp = document.getElementById("esp-" + bin);
+    const last = document.getElementById("last-" + bin);
 
     if (online) {
-
-        esp.textContent =
-            "ONLINE";
-
-        esp.style.color =
-            "var(--green)";
-
-        last.textContent =
-            formatTime(
-                lastUpdate[bin]
-            );
-
+        esp.textContent = "ONLINE";
+        esp.style.color = "var(--green)";
+        last.textContent = formatTime(lastUpdate[bin]);
     } else {
-
-        esp.textContent =
-            "OFFLINE";
-
-        esp.style.color =
-            "var(--red)";
-
-        last.textContent =
-            lastUpdate[bin] > 0
-            ? formatTime(
-                lastUpdate[bin]
-              )
-            : "Waiting...";
-
+        esp.textContent = "OFFLINE";
+        esp.style.color = "var(--red)";
+        last.textContent = lastUpdate[bin] > 0 ? formatTime(lastUpdate[bin]) : "Waiting...";
     }
-
 }
-
 
 /* ==================================================
    SYSTEM STATUS
 ================================================== */
-
 function updateSystemStatus() {
+    const now = Date.now();
 
-    const now =
-        Date.now();
+    const bin1Online = lastUpdate.bin1 > 0 && now - lastUpdate.bin1 <= ONLINE_TIMEOUT;
+    const bin2Online = lastUpdate.bin2 > 0 && now - lastUpdate.bin2 <= ONLINE_TIMEOUT;
 
+    const count = Number(bin1Online) + Number(bin2Online);
 
-    const bin1Online =
-        lastUpdate.bin1 > 0 &&
-        now - lastUpdate.bin1 <=
-        ONLINE_TIMEOUT;
-
-
-    const bin2Online =
-        lastUpdate.bin2 > 0 &&
-        now - lastUpdate.bin2 <=
-        ONLINE_TIMEOUT;
-
-
-    const count =
-        Number(bin1Online) +
-        Number(bin2Online);
-
-
-    const dot =
-        document.getElementById(
-            "systemDot"
-        );
-
-
-    const text =
-        document.getElementById(
-            "systemText"
-        );
-
+    const dot = document.getElementById("systemDot");
+    const text = document.getElementById("systemText");
 
     if (count === 2) {
-
-        dot.className =
-            "dot online";
-
-        text.textContent =
-            "2 BINS ONLINE";
-
+        dot.className = "dot online";
+        text.textContent = "2 BINS ONLINE";
     } else if (count === 1) {
-
-        dot.className =
-            "dot online";
-
-        text.textContent =
-            "1 BIN ONLINE";
-
+        dot.className = "dot online";
+        text.textContent = "1 BIN ONLINE";
     } else {
-
-        dot.className =
-            "dot offline";
-
-        text.textContent =
-            "ALL OFFLINE";
-
+        dot.className = "dot offline";
+        text.textContent = "ALL OFFLINE";
     }
-
 }
-
 
 /* ==================================================
    STATUS
+   (added a MEDIUM tier so the text label matches the
+   yellow "medium" badge color used for 40-69% fill)
 ================================================== */
-
-function getStatus(
-    fill
-) {
-
+function getStatus(fill) {
     if (fill >= 90) {
-
         return "FULL";
-
     }
-
     if (fill >= 70) {
-
         return "ALMOST FULL";
-
     }
-
+    if (fill >= 40) {
+        return "MEDIUM";
+    }
     return "NORMAL";
-
 }
-
 
 /* ==================================================
    ALERTS
 ================================================== */
-
 function updateAlerts() {
-
     const fullBins = [];
 
+    ["bin1", "bin2"].forEach(bin => {
+        const data = binData[bin];
+        const fill = Number(data.fillpercentage || 0);
 
-    ["bin1", "bin2"].forEach(
-        bin => {
+        const isFull = fill >= FULL_LEVEL || String(data.status || "").toUpperCase() === "FULL";
 
-            const data =
-                binData[bin];
+        if (isFull) {
+            fullBins.push(bin === "bin1" ? "Bin 1" : "Bin 2");
 
-
-            const fill =
-                Number(
-                    data.fillpercentage || 0
+            if (!fullState[bin]) {
+                sendNotification(
+                    bin === "bin1" ? "Bin 1 is FULL" : "Bin 2 is FULL",
+                    "Please empty the trash bin."
                 );
-
-
-            const isFull =
-                fill >= FULL_LEVEL ||
-                String(
-                    data.status || ""
-                ).toUpperCase() ===
-                "FULL";
-
-
-            if (isFull) {
-
-                fullBins.push(
-                    bin === "bin1"
-                    ? "Bin 1"
-                    : "Bin 2"
-                );
-
-
-                if (
-                    !fullState[bin]
-                ) {
-
-                    sendNotification(
-                        bin === "bin1"
-                        ? "Bin 1 is FULL"
-                        : "Bin 2 is FULL",
-                        "Please empty the trash bin."
-                    );
-
-                    fullState[bin] =
-                        true;
-
-                }
-
-            } else {
-
-                fullState[bin] =
-                    false;
-
+                fullState[bin] = true;
             }
-
+        } else {
+            fullState[bin] = false;
         }
-    );
+    });
 
+    const alertEl = document.getElementById("fullAlert");
+    const text = document.getElementById("fullAlertText");
 
-    const alert =
-        document.getElementById(
-            "fullAlert"
-        );
-
-
-    const text =
-        document.getElementById(
-            "fullAlertText"
-        );
-
-
-    if (
-        fullBins.length > 0
-    ) {
-
-        alert.classList.add(
-            "show"
-        );
-
-
+    if (fullBins.length > 0) {
+        alertEl.classList.add("show");
         text.textContent =
             fullBins.length === 1
-            ? fullBins[0] +
-              " is full. Please empty it."
-            : fullBins.join(
-                " and "
-              ) +
-              " are full. Please empty them.";
-
+                ? fullBins[0] + " is full. Please empty it."
+                : fullBins.join(" and ") + " are full. Please empty them.";
     } else {
-
-        alert.classList.remove(
-            "show"
-        );
-
+        alertEl.classList.remove("show");
     }
-
 }
-
 
 /* ==================================================
    NOTIFICATION
 ================================================== */
-
-function sendNotification(
-    title,
-    message
-) {
-
-    if (
-        "Notification" in window &&
-        Notification.permission ===
-        "granted"
-    ) {
-
-        new Notification(
-            title,
-            {
-                body: message
-            }
-        );
-
+function sendNotification(title, message) {
+    if ("Notification" in window && Notification.permission === "granted") {
+        new Notification(title, { body: message });
     }
-
 }
-
 
 /* ==================================================
    ENABLE NOTIFICATION
 ================================================== */
-
 function enableNotifications() {
-
-    if (
-        !("Notification" in window)
-    ) {
-
-        alert(
-            "Notifications are not supported."
-        );
-
+    if (!("Notification" in window)) {
+        alert("Notifications are not supported.");
         return;
-
     }
 
-
-    Notification.requestPermission()
-        .then(permission => {
-
-            if (
-                permission ===
-                "granted"
-            ) {
-
-                alert(
-                    "Notifications enabled."
-                );
-
-            }
-
-        });
-
+    Notification.requestPermission().then(permission => {
+        if (permission === "granted") {
+            alert("Notifications enabled.");
+        }
+    });
 }
-
 
 /* ==================================================
    TIME
 ================================================== */
-
-function formatTime(
-    timestamp
-) {
-
-    return new Date(
-        timestamp
-    ).toLocaleTimeString(
-        [],
-        {
-            hour:
-                "2-digit",
-
-            minute:
-                "2-digit",
-
-            second:
-                "2-digit"
-        }
-    );
-
+function formatTime(timestamp) {
+    return new Date(timestamp).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
+    });
 }
-
 
 function updateClock() {
-
-    document.getElementById(
-        "clock"
-    ).textContent =
-        new Date().toLocaleTimeString();
-
+    document.getElementById("clock").textContent = new Date().toLocaleTimeString();
 }
 
+setInterval(updateClock, 1000);
 
-setInterval(
-    updateClock,
-    1000
-);
-
-
-setInterval(
-    updateSystemStatus,
-    1000
-);
-
-
-setInterval(
-    () => {
-
-        updateOnlineStatus(
-            "bin1"
-        );
-
-        updateOnlineStatus(
-            "bin2"
-        );
-
-        updateSystemStatus();
-
-    },
-    1000
-);
-
+/* Combined interval handles system status + per-bin online
+   status every second — removed the duplicate standalone
+   updateSystemStatus interval that used to run alongside it. */
+setInterval(() => {
+    updateOnlineStatus("bin1");
+    updateOnlineStatus("bin2");
+    updateSystemStatus();
+}, 1000);
 
 updateClock();
-
 updateSystemStatus();
-
 </script>
 
 </body>
